@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اشترك معنا</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
+        h1 { text-align: center; color: #333; }
+        form { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        label { display: block; margin: 15px 0 8px; font-weight: bold; color: #444; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .phone-group { display: flex; gap: 10px; }
+        .phone-code { width: 100px; text-align: center; background: #eee; font-weight: bold; }
+        .phone-number { flex: 1; }
+        button { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; margin-top: 25px; }
+        button:hover { background: #218838; }
+        .success { text-align: center; color: #28a745; font-weight: bold; margin-top: 20px; display: none; }
+    </style>
+
+    <!-- OneSignal SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+                appId: "9fff8ba1-a3f9-45b6-b38c-d141ab4617eb",  // ⚠️ استبدل ده بالـ App ID بتاعك من OneSignal
+                notifyButton: { enable: true },
+                slidedown: { enabled: true, autoPrompt: true, timeDelay: 10, pageViews: 1 }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>سجل بياناتك لنرسل لك عروض خاصة</h1>
+    
+    <form id="customerForm">
+        <label>الاسم الكامل *</label>
+        <input type="text" id="name" required>
+
+        <label>البريد الإلكتروني *</label>
+        <input type="email" id="email" required>
+
+        <label>رقم الموبايل *</label>
+        <div class="phone-group">
+            <input type="text" class="phone-code" value="+20" readonly>
+            <input type="tel" id="phone" class="phone-number" placeholder="1012345678" required>
+        </div>
+
+        <label>النوع *</label>
+        <select id="gender" required>
+            <option value="">اختر النوع</option>
+            <option value="ذكر">ذكر</option>
+            <option value="أنثى">أنثى</option>
+        </select>
+
+        <label>الحالة الاجتماعية *</label>
+        <select id="marital" required>
+            <option value="">اختر الحالة</option>
+            <option value="أعزب">أعزب</option>
+            <option value="متزوج">متزوج</option>
+        </select>
+
+        <label>العمر *</label>
+        <input type="number" id="age" min="18" max="100" placeholder="مثال: 30" required>
+
+        <button type="submit">تسجيل البيانات</button>
+    </form>
+
+    <div class="success" id="successMsg">تم حفظ بياناتك بنجاح! 🎉</div>
+
+    <script>
+        document.getElementById('customerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phoneNumber = document.getElementById('phone').value.trim();
+            const fullPhone = '+20' + phoneNumber; // دايماً +20
+            const gender = document.getElementById('gender').value;
+            const marital = document.getElementById('marital').value;
+            const age = document.getElementById('age').value;
+
+            OneSignalDeferred.push(async function(OneSignal) {
+                // إضافة الإيميل
+                await OneSignal.User.addEmail(email);
+
+                // إضافة رقم الموبايل للـ SMS
+                await OneSignal.User.addSms(fullPhone);
+
+                // إضافة كل البيانات كـ Tags (هتظهر في الداشبورد)
+                OneSignal.User.addTags({
+                    name: name,
+                    email: email,
+                    phone: fullPhone,
+                    gender: gender,
+                    marital_status: marital,
+                    age: age,
+                    registered_date: new Date().toISOString().split('T')[0]
+                });
+
+                // إظهار رسالة النجاح
+                document.getElementById('successMsg').style.display = 'block';
+                document.getElementById('customerForm').reset();
+            });
+        });
+    </script>
+</body>
+</html>
