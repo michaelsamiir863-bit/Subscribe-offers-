@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -24,9 +25,10 @@
         window.OneSignalDeferred = window.OneSignalDeferred || [];
         OneSignalDeferred.push(async function(OneSignal) {
             await OneSignal.init({
-                appId: "9fff8ba1-a3f9-45b6-b38c-d141ab4617eb",  // ⚠️ استبدل ده بالـ App ID بتاعك من OneSignal
+                appId: "9fff8ba1-a3f9-45b6-b38c-d141ab4617eb",  // استبدل ده بالـ App ID الحقيقي
                 notifyButton: { enable: true },
-                slidedown: { enabled: true, autoPrompt: true, timeDelay: 10, pageViews: 1 }
+                slidedown: { enabled: true, autoPrompt: true, timeDelay: 10, pageViews: 1 },
+                allowLocalhostAsSecureOrigin: true  // مهم لو بتختبر على localhost
             });
         });
     </script>
@@ -76,19 +78,15 @@
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
             const phoneNumber = document.getElementById('phone').value.trim();
-            const fullPhone = '+20' + phoneNumber; // دايماً +20
+            const fullPhone = '+20' + phoneNumber;
             const gender = document.getElementById('gender').value;
             const marital = document.getElementById('marital').value;
             const age = document.getElementById('age').value;
 
             OneSignalDeferred.push(async function(OneSignal) {
-                // إضافة الإيميل
                 await OneSignal.User.addEmail(email);
-
-                // إضافة رقم الموبايل للـ SMS
                 await OneSignal.User.addSms(fullPhone);
 
-                // إضافة كل البيانات كـ Tags (هتظهر في الداشبورد)
                 OneSignal.User.addTags({
                     name: name,
                     email: email,
@@ -99,7 +97,6 @@
                     registered_date: new Date().toISOString().split('T')[0]
                 });
 
-                // إظهار رسالة النجاح
                 document.getElementById('successMsg').style.display = 'block';
                 document.getElementById('customerForm').reset();
             });
